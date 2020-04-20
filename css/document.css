@@ -1,0 +1,103 @@
+body { font-size: 100%; }
+
+body { margin: 1.5em 0 0 1.5em;
+	   <!--background: url(back.gif) top left;--> }
+
+body { width: 60em; }
+p, h1, h2 { width: 40em; }
+ol, ul { width: 40em; }
+			
+h1		{	font-size: 1.5em;
+			line-height: 0.9583em;
+			margin: 0 0 1em 0;
+			border-bottom: 0.04167em inset #aaa; }
+			
+h2		{	font-size: 1.1667em;
+			line-height: 1.286em;
+			margin-top: 1.929em;
+			margin-bottom: 0.643em; }
+
+h3		{	font-size: 1.1667em;
+			line-height: 1.286em;
+			margin-top: 0.643em;
+			margin-bottom: 0em;
+		}
+
+pre		{	font-size: 1em; 
+			line-height: 1.5em; 
+			margin: 0 0 1.5em 0;
+			font-family: inherit; }
+
+p		{ 	font-size: 1em;
+			line-height: 1.5em;
+			margin: 0 0 1.5em 0; }
+
+h1 + h3	{	font-size: 1em;
+			font-weight: normal;
+			line-height: 1.5em;
+			margin: -1.5em 0 1.5em 0; }
+
+ul		{	list-style: none;
+			padding: 0 0 0 0;
+			margin: 0 0 1.5em 0; }
+			
+ol		{	padding: 0 0 0 0;
+			margin: 0 0 1.5em 0; }
+
+li		{	margin-left: 1.5em;
+			font-size: 0.85em;
+			line-height: 1.765em; }
+			
+li.reading { padding-left: 1em; }
+
+li.reading-question { padding-left: 2em; }
+
+a {	font-size: 1em;
+	text-decoration: none; }
+
+.untrustworthy { color: #630000; }
+
+.title { text-decoration: underline; }
+
+.speaker {	color: #930000;
+            font-size: 1.10em;
+			margin: 0 0 0 0; }
+			
+.figure {
+	color: #630000;
+	font-family:"Courier New", Courier, monospace;
+}
+
+.caution { 
+	background-color: #F9F900;
+	font-family:"Courier New", Courier, monospace;
+	text-align: center;
+	border-left: 2px solid #999;
+	border-top: 2px solid #999;
+	border-right: 2px solid #000;
+	border-bottom: 2px solid #000;
+}
+
+.latin { color: #630000; }
+
+.citation {	width: 47.06em;
+			font-size: 0.85em;
+			line-height: 1.765em;
+			text-align: right;
+			margin: -1.765em 0 1.765em 0; }
+
+.note, { width: 47.06em;
+		font-size: 0.85em;
+		color: #999;
+		line-height: 1.765em;
+		padding-left: 1.5em; }
+
+.sidenote {	float: right;
+			clear: right;
+			margin: 0 -20em 1.2em 0;
+			width: 18em;
+		
+			font-size: 0.8333em;
+			line-height: 1.2em; }
+				
+.superscript { font-size: 1em; }

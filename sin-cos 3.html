@@ -1,0 +1,228 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+		body {
+			margin: 0px;
+			padding: 0px;
+		}
+		</style>
+	</head>
+	
+	<body>
+		<canvas id="graph" width="1024" height="768">	
+	</canvas>
+
+<script>
+
+window.requestAnimFrame = (function(callback) {
+	return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+	function(callback) {
+		window.setTimeout(callback, 1000 / 60);
+	};
+})();
+
+function drawSinSlider(circle, context) {
+	
+	dy = circle.y - circle.r * Math.sin(circle.a * Math.PI / 180.0);
+	dx = circle.x + circle.r + 20
+	context.beginPath();
+	context.arc(dx, dy, 5, 0, 2 * Math.PI, false); 
+	context.fillStyle = '#cf0c0c'; 
+	context.fill();
+	context.stroke();
+
+	dy = circle.y - (circle.r) * Math.sin(circle.b * Math.PI / 180.0);
+	dx = circle.x + (circle.r) + 20
+	context.beginPath();
+	context.arc(dx, dy, 5, 0, 2 * Math.PI, false); 
+	context.fillStyle = '#0cfc0c'; 
+	context.fill();
+	context.stroke();
+}
+
+function drawSinGraphSlider(origin, circle, context) {
+	
+	dx = origin.x + (circle.a % 360)
+	dy = origin.y - circle.r * Math.sin(circle.a * Math.PI / 180.0);
+	
+	context.beginPath();
+	context.arc(dx, dy, 5, 0, 2 * Math.PI, false); 
+	context.fillStyle = '#cf0c0c'; 
+	context.fill();
+	context.stroke();
+}
+
+
+function drawCosSlider(circle, context) {
+	
+	dx = circle.x + circle.r * Math.cos(circle.a * Math.PI / 180.0);
+	dy = circle.y + circle.r + 20
+	context.beginPath();
+	context.arc(dx, dy, 5, 0, 2 * Math.PI, false); 
+	context.fillStyle = '#cf0c0c'; 
+	context.fill();
+	context.stroke();
+}
+
+function drawParameters(circle, time, context) {
+	context.font = context.font.replace(/\d+px/, "18px");
+	context.strokeText("Angle: " + Math.floor(circle.a),10,50);
+	context.strokeText("Time: " + Math.floor(time),10,80);
+}
+
+function drawSineCurve(origin, values, context) {
+	context.beginPath();
+	context.strokeStyle = '#000'; 
+	values.forEach(function(item, index, array) {
+		context.lineTo(origin.x + index, item);
+	});
+	context.stroke();
+}
+
+function drawUnitCircle(circle, context) {
+	// Draw the unit circle
+	context.beginPath();
+	context.arc(circle.x, circle.y, circle.r, 0, 2 * Math.PI, false); 
+	context.fillStyle = '#8ED6FF'; 
+	context.fill();
+	context.stroke();
+	
+	// Draw the center
+
+	// Draw the other triangle.
+	dx = circle.x + (circle.r) * Math.cos(circle.b * Math.PI / 180.0);
+	dy = circle.y - (circle.r) * Math.sin(circle.b * Math.PI / 180.0);
+		
+	context.beginPath();
+	context.strokeStyle = '#000'; 
+	context.moveTo(dx,dy);
+	context.lineTo(circle.x, circle.y);
+
+	context.moveTo(dx,dy);
+	context.lineTo(dx, circle.y);
+
+	context.moveTo(dx,circle.y);
+	context.lineTo(circle.x, circle.y);
+
+	context.stroke();
+
+	// Draw the triangle
+	dx = circle.x + circle.r * Math.cos(circle.a * Math.PI / 180.0);
+	dy = circle.y - circle.r * Math.sin(circle.a * Math.PI / 180.0);
+		
+	context.beginPath();
+	context.strokeStyle = '#000'; 
+	context.moveTo(dx,dy);
+	context.lineTo(circle.x, circle.y);
+
+	context.moveTo(dx,dy);
+	context.lineTo(dx, circle.y);
+
+	context.moveTo(dx,circle.y);
+	context.lineTo(circle.x, circle.y);
+
+	context.stroke();
+
+	// Draw the triangle
+	// dx = circle.x + circle.r * Math.cos(circle.b * Math.PI / 180.0);
+	// dy = circle.y - circle.r * Math.sin(circle.b * Math.PI / 180.0);
+	//
+	// context.beginPath();
+	// context.strokeStyle = '#000';
+	// context.moveTo(dx,dy);
+	// context.lineTo(circle.x, circle.y);
+	//
+	// context.moveTo(dx,dy);
+	// context.lineTo(dx, circle.y);
+	//
+	// context.moveTo(dx,circle.y);
+	// context.lineTo(circle.x, circle.y);
+	//
+	// context.stroke();
+}
+	
+function animate(unitCircle, canvas, context, startTime) {
+
+	var time = (new Date()).getTime() - startTime;
+	
+	var delta = time - unitCircle.lastTime
+	unitCircle.lastTime = time
+	// update
+	unitCircle.a += (angularSpeed * delta / 1000) % 360;
+	unitCircle.b = 180 - unitCircle.a
+	
+	if (fullSineValues.length == 0) {
+		for (a = 0; a < 360; a++) {
+			fullSineValues.push(unitCircle.y - unitCircle.r * Math.sin(a * Math.PI / 180.0));
+		}
+	}
+	
+	if (angularSpeed > 0) {
+		sineValues.unshift(unitCircle.y - unitCircle.r * Math.sin(unitCircle.a * Math.PI / 180.0));
+	}
+	
+	if (sineValues.length > 400) {
+		sineValues.pop();
+	}
+	
+	// redraw
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	drawUnitCircle(unitCircle, context);
+	
+	drawSinSlider(unitCircle, context);
+	drawCosSlider(unitCircle, context);
+	
+	//drawSineCurve(sineOrigin, sineValues, context);
+	drawSineCurve(sineOrigin, fullSineValues, context);
+	drawSinGraphSlider(sineOrigin, unitCircle, context);
+	
+	drawParameters(unitCircle, time, context);
+	// request new frame
+	requestAnimFrame(function() {
+		animate(unitCircle, canvas, context, startTime);
+	});
+}
+
+var canvas = document.getElementById('graph');
+var context = canvas.getContext('2d');
+
+var sineOrigin = {
+	x : 420,
+	y : 200
+}
+
+var unitCircle = {
+	x : 200,
+	y : 200,
+	r : 100,
+	a : 0,
+	b : 180,
+	lastTime : 0
+};
+
+var angularSpeed = 30;	// degrees / second
+
+var sineValues = [];
+var fullSineValues = [];
+
+drawUnitCircle(unitCircle, context);
+
+document.onkeydown = function(event){
+    var x = window.event ? window.event : e;
+    console.log(x.keyCode)
+	
+	if (x.keyCode === 32) {
+		angularSpeed = angularSpeed == 60 ? 0 : 60;
+	}
+}
+
+// wait one second before starting animation
+setTimeout(function() {
+	var startTime = (new Date()).getTime();
+	animate(unitCircle, canvas, context, startTime);
+}, 1000);
+</script>
+
+</body>
+</html> 

@@ -1,0 +1,73 @@
+body	{	font-size: 120%; }
+
+body	{	margin: 1.5em 0 0 1.5em; 
+			padding-left: 4em; }
+
+body		{	width: 60em; }
+p, h1, h2	{	width: 40em; }
+ul			{	width: 40em; }
+			
+h1		{	font-size: 1.5em;
+			line-height: 0.9583em;
+			margin: 0 0 1em 0;
+			border-bottom: 0.04167em inset #000; }
+			
+h2		{	font-size: 1.1667em;
+			line-height: 1.286em;
+			margin-top: 1.929em;
+			margin-bottom: 0.643em; }
+
+h3		{	font-size: 1.1667em;
+			line-height: 1.286em;
+			margin-top: 0.643em;
+			margin-bottom: 0em;
+		}
+
+pre		{	font-size: 1em; 
+			line-height: 1.5em; 
+			margin: 0 0 1.5em 0;
+			font-family: inherit; }
+
+p		{ 	font-size: 1.1em;
+			line-height: 1.5em;
+			margin: 0 0 1.5em 0; }
+
+h1 + h3	{	font-size: 1em;
+			font-weight: normal;
+			line-height: 1.5em;
+			margin: -1.5em 0 1.5em 0; }
+
+ul		{	list-style: none;
+			padding: 0 0 0 0;
+			margin: 0 0 1.5em 0; }
+			
+ol		{	padding: 0 0 0 0;
+			margin: 0 0 1.5em 0; }
+
+li		{	margin-left: 1.5em;
+			font-size: 0.85em;
+			line-height: 1.765em; }
+
+li.reading	{ padding-left: 1em; }
+
+a		{	font-size: 1em;
+			text-decoration: none; 
+			color: #000; }
+
+.title	{	text-decoration: underline; }
+
+.citation	{ 	width: 47.06em;
+				font-size: 0.85em;
+				line-height: 1.765em;
+				text-align: right;
+				margin: -1.765em 0 0 0; }
+		
+.sidenote	{	float: right;
+				clear: right;
+				margin: 0 -20em 1.2em 0;
+				width: 18em;
+				
+				font-size: 0.8333em;
+				line-height: 1.2em; }
+				
+.superscript	{	font-size: 1em; }
