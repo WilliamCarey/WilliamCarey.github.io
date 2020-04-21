@@ -1,7 +1,7 @@
 // Drawing utilities
 
 class DraggableVertex {
-	constructor(canvas, x, y, freedom, fill, updateNotifier) {
+	constructor(canvas, x, y, freedom, updateNotifier) {
 		this.ctx = canvas.getContext("2d");
 		canvas.addEventListener("mousedown", this.startDrag.bind(this))
 		canvas.addEventListener("mousemove", this.drag.bind(this))
@@ -9,10 +9,11 @@ class DraggableVertex {
 		
 		this.updateNotifier = updateNotifier
 		
+		this.fill = "#6666AA";
+		
 		this.x = x;
 		this.y = y;
 		this.freedom = freedom; // Stringly typed: HORIZONTAL|VERTICAL|FREE
-		this.fill = fill;
 		
 		this.isDragging = false;
 		
