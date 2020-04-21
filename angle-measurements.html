@@ -56,7 +56,7 @@
 		function setUpTriangleTangle () {
 			var triangleTangle = new Tangle(document.getElementById("triangle-tangle"), {
 				initialize: function () {
-					this.ra = 90;
+					this.circleMeasure = 360;
 					this.ta = 180;
 					
 					this.canvas = document.getElementById("angle-measure");
@@ -72,7 +72,7 @@
 				},
 				
 				update: function () {
-					this.ta = 2 * this.ra;
+					this.ta = this.circleMeasure / 2;
 					// draw the triangle
 					
 					this.clear();
@@ -100,6 +100,33 @@
 					this.v1.draw()
 					this.v2.draw()
 					this.v3.draw()
+
+					// Label the angles
+					this.ctx.fillStyle = '#000';
+					this.ctx.font = "14px Helvetica";
+					
+					// To calculate the offset: calculate the angle, divide by two, add enough to get it in place.
+					var angleTheta = Math.atan2(this.v2.y - this.v1.y, this.v1.x - this.v2.x);
+					offsetAngle = angleTheta / 2;
+					oy = 30;
+					ox = oy / Math.tan(offsetAngle);
+					
+					this.ctx.fillText(Math.round(angleTheta * this.ta / Math.PI).toString(), this.v1.x - ox, 50 + oy);
+
+					// To calculate the offset: calculate the angle, divide by two, add enough to get it in place.
+					var anglePhi = Math.PI - Math.atan2(this.v3.y - this.v1.y, this.v1.x - this.v3.x);
+					offsetAngle = anglePhi / 2;
+					oy = 30;
+					ox = oy / Math.tan(offsetAngle);
+					
+					this.ctx.fillText(Math.round(anglePhi * this.ta / Math.PI).toString(), this.v1.x + ox, 50 + oy);
+
+					var angleRho = Math.PI - anglePhi - angleTheta; // Right?
+					var offsetAngle = angleTheta + angleRho / 2
+					oy = 40;
+					ox = oy / Math.tan(offsetAngle);
+					
+					this.ctx.fillText(Math.round(angleRho * this.ta / Math.PI).toString(), this.v1.x - ox - 10, 50 + oy);
 
                 }
             });
@@ -138,7 +165,7 @@
 	You can click and drag the numbers in blue to change them!
 </p>
 		
-<p id="triangle-tangle">Imagine we made the measure of a right angle <span data-var="ra" class="TKAdjustableNumber" data-min="1" data-max="10000">&deg;</span>, then a whole triangle would have <span data-var="ta"></span>&deg; in it.
+<p id="triangle-tangle">Imagine we divided a circle into <span data-var="circleMeasure" class="TKAdjustableNumber" data-min="1" data-max="10000"> parts</span>, then a triangle would have <span data-var="ta"></span> parts in it.
 </p>
 
 <canvas id="angle-measure" width="400" height="300"></canvas>

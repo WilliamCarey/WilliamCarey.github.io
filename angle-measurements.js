@@ -2,6 +2,7 @@
 
 class DraggableVertex {
 	constructor(canvas, x, y, freedom, updateNotifier) {
+
 		this.ctx = canvas.getContext("2d");
 		canvas.addEventListener("mousedown", this.startDrag.bind(this))
 		canvas.addEventListener("mousemove", this.drag.bind(this))
@@ -9,7 +10,7 @@ class DraggableVertex {
 		
 		this.updateNotifier = updateNotifier
 		
-		this.fill = "#6666AA";
+		this.fill = "#3333CC";
 		
 		this.x = x;
 		this.y = y;
@@ -86,7 +87,9 @@ class DraggableVertex {
 	stopDrag(e) {
 		e.preventDefault();
 		e.stopPropagation();
-
+		
+		this.fill = "#3333CC";
 		this.isDragging = false;
+		this.updateNotifier();
 	}
 }
