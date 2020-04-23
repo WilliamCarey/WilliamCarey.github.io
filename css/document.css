@@ -55,6 +55,11 @@ li.reading-question { padding-left: 2em; }
 a {	font-size: 1em;
 	text-decoration: none; }
 
+canvas {
+	border: 1px solid #000;
+	margin: 1em;
+}
+
 .untrustworthy { color: #630000; }
 
 .title { text-decoration: underline; }

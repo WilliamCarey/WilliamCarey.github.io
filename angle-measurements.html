@@ -24,11 +24,7 @@
 			margin: 20px;
 			padding: 0px;
 		}
-		
-		#angle-measure {
-			padding: 2px;
-			border: 1px solid #000;
-		}
+
 	</style>
 	
 	<script type="text/javascript">
@@ -133,7 +129,7 @@
         }
 		
 		function setUpCirclePieTangle () {
-			var circleTangle = new Tangle(document.getElementById("pie-tangle"), {
+			var circleTangle = new Tangle(document.getElementById("circle-examples"), {
 				initialize: function () {
 					this.segments = 2
 				},
@@ -153,6 +149,22 @@
 		
 <body onload="setUpTangles();">
 
+<h1>Angles in Circles</h1>
+
+<p class="caution">
+This is a reactive document! Please play with the things in blue! You'll get much more out of this if you play around a bit. I know it works on a full computer. Probably not on touch based devices.
+</p>
+
+<p>
+In class yesterday we introduced the idea that there's a deep and fundamental relationship between circles and triangles. Today we're going to explore that more deeply.
+</p>
+
+<p>
+Angle measurement is all about dividing up a circle. Let's look at a circle whose angles are measured in degrees. Some are familiar:
+</p>
+
+<canvas id="circle-examples" width="400" height="300"></canvas>
+
 <h1>Angles in Right Triangles</h1>
 		
 <p>We've been talking about right triangles so far, and we've been talking about their angles. The central thing we've said is that a right angle measures 90&deg;, and the sum of all the angles in a triangle is 180&deg;. Those theorems are true - they're part of the eternal structure of the cosmos, woven into the nature of mathematics.</p>
@@ -162,7 +174,7 @@
 <hr />
 
 <p class="caution">
-	You can click and drag the numbers in blue to change them!
+	Remember, you can click and drag the numbers in blue to change them!
 </p>
 		
 <p id="triangle-tangle">Imagine we divided a circle into <span data-var="circleMeasure" class="TKAdjustableNumber" data-min="1" data-max="10000"> parts</span>, then a triangle would have <span data-var="ta"></span> parts in it.
@@ -174,12 +186,11 @@
 		
 180&deg; seems like a fairly random number to pick for the measure of the triangle. Why 180? Why not, say, 100? or 10? Or 100,000? The answer lies in factoring. 90 is evenly divisible by 2, 3, 5, 6, 9, 10, 15, and 18. So if you want to be able to talk about fractions of a right angle, 90 is actually a really nice angle to pick! 180 is also evenly divisible by 4 and 12, so it's even better! If we picked 10, then a third of that angle would be a mess. We've called the system where the measure of the angles in a triangle is 180 the <b>degrees</b> system.
 		
-		<h2>So, what else is there?</h2>
+<h2>So, what else is there?</h2>
 
-<p>Oh my gosh, so many other systems are in common use. A lameish one is to say that the sum of the measures of a triangle is 1. Then the measure of a right angle is 0.5. Kind of weaksauce, but you could see why it's nice.	
+<p>Oh my gosh, so many other systems are in common use. A lameish one is to say that the sum of the measures of a triangle is 1. Then the measure of a right angle is 0.5. Kind of weaksauce, but you could see why it's nice.</p>
 	
-The one you'll run into the most is the radian system. In the radian system, the measure of a triangle is &pi; radians. This seems to have all the disadvantages imaginable. It's not nicely divisible like 180&deg;. It's not even a whole number! It's not even a rational number! What gives?</p>
-
+<p>The one you'll run into the most is the radian system. In the radian system, the measure of a triangle is &pi; radians. This seems to have all the disadvantages imaginable. It's not nicely divisible like 180&deg;. It's not even a whole number! It's not even a rational number! What gives? We'll explore why radians are important soon.</p>
 
 </body>
 </html> 

@@ -76,6 +76,8 @@ class DraggableVertex {
         if (this.freedom == "VERTICAL" || this.freedom == "FREE") {
 			this.y += dy;
         }
+		
+		if (this.freedom == "")
 
         // reset the starting mouse position for the next mousemove
         this.startX = e.offsetX;
