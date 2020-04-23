@@ -32,7 +32,7 @@
 		function setUpTangles () {
 			setUpAngleTangle();
 			setUpTriangleTangle();
-			//setUpCirclePieTangle();
+			setUpCirclePieTangle();
 		}
 		
 		function setUpAngleTangle() {
@@ -129,17 +129,37 @@
         }
 		
 		function setUpCirclePieTangle () {
-			var circleTangle = new Tangle(document.getElementById("circle-examples"), {
+			var circleTangle = new Tangle(document.getElementById("circle-angles"), {
 				initialize: function () {
-					this.segments = 2
+					this.x = 150;
+					this.y = 150;
+					this.r = 100;
+					
+					this.canvas = document.getElementById("circle-angle-measure");
+					this.ctx = this.canvas.getContext("2d");
+					
+					this.v1 = new DraggableRadialVertex(this.canvas, 180,50,"HORIZONTAL", () => {this.update()});
+					
 				},
 				
 				clear: function() {
-					
+					this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 				},
 				
 				update: function() {
+					this.clear();
 					
+					// Draw Zorro's Theorem with Movable Vertices
+					this.ctx.beginPath();
+					this.ctx.strokeStyle = '#000'; 
+					this.ctx.fillStyle = "#eee";
+					this.ctx.beginPath();
+					this.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					this.ctx.stroke();
+					
+					v1.draw();
 				}
 			});
 		}
@@ -159,11 +179,12 @@ This is a reactive document! Please play with the things in blue! You'll get muc
 In class yesterday we introduced the idea that there's a deep and fundamental relationship between circles and triangles. Today we're going to explore that more deeply.
 </p>
 
-<p>
+<p id="circle-angles">
 Angle measurement is all about dividing up a circle. Let's look at a circle whose angles are measured in degrees. Some are familiar:
 </p>
 
-<canvas id="circle-examples" width="400" height="300"></canvas>
+
+<canvas id="circle-angle-measure" width="400" height="300"></canvas>
 
 <h1>Angles in Right Triangles</h1>
 		
