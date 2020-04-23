@@ -17,7 +17,8 @@
 	<script type="text/javascript" src="TangleKit/BVTouchable.js"></script>
 	<script type="text/javascript" src="TangleKit/TangleKit.js"></script>
 
-	<script type="text/javascript" src="angle-measurements.js"></script>
+	<script type="text/javascript" src="draggable-vertex.js"></script>
+	<script type="text/javascript" src="radial-vertex.js"></script>
 
 	<style>
 		body {
@@ -135,10 +136,13 @@
 					this.y = 150;
 					this.r = 100;
 					
+					this.radAngle = 0;
+					this.degAngle = 0;
+					
 					this.canvas = document.getElementById("circle-angle-measure");
 					this.ctx = this.canvas.getContext("2d");
 					
-					this.v1 = new DraggableRadialVertex(this.canvas, 180,50,"HORIZONTAL", () => {this.update()});
+					this.v1 = new RadialVertex(this.canvas, 150,150,100, () => {this.update()});
 					
 				},
 				
@@ -159,7 +163,36 @@
 					this.ctx.fill();
 					this.ctx.stroke();
 					
-					v1.draw();
+					// Compute the angle of the selected sector. 
+					var dx = this.v1.x - this.x;
+					var dy = this.v1.y - this.y;
+					
+					this.radAngle = Math.atan2(dy, dx);
+					if (this.radAngle < 0) {
+						this.radAngle += Math.PI * 2;
+					}
+					
+					this.degAngle = 360 - this.radAngle * 180 / Math.PI;
+					if (this.degAngle >= 360) {
+						this.degAngle = 0;
+					}
+					
+					this.ctx.font='14px verdana';
+					this.ctx.strokeText("Angle: " + Math.floor(360 - (this.radAngle * 180 / Math.PI)),10,50);
+
+					this.ctx.fillStyle = "#cce";
+					this.ctx.beginPath();
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.arc(this.x, this.y, this.r, 0, this.radAngle, true); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					
+					
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.lineTo(this.x + this.r, this.y);
+					this.ctx.stroke();
+					
+					this.v1.draw();
 				}
 			});
 		}
@@ -180,9 +213,8 @@ In class yesterday we introduced the idea that there's a deep and fundamental re
 </p>
 
 <p id="circle-angles">
-Angle measurement is all about dividing up a circle. Let's look at a circle whose angles are measured in degrees. Some are familiar:
+Angle measurement is all about dividing up a circle. Let's look at a circle whose angles are measured in degrees. The whole circle is 360&deg;, so the angle is a fraction of that:
 </p>
-
 
 <canvas id="circle-angle-measure" width="400" height="300"></canvas>
 
