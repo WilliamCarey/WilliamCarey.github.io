@@ -31,9 +31,169 @@
 	<script type="text/javascript">
 		
 		function setUpTangles () {
+			setUpCirclePieTangle();
+			setUpVariableCircleDivisionTangle();
 			setUpAngleTangle();
 			setUpTriangleTangle();
-			setUpCirclePieTangle();
+		}
+		
+		function setUpCirclePieTangle () {
+			var circleTangle = new Tangle(document.getElementById("circle-angles"), {
+				initialize: function () {
+					this.x = 150;
+					this.y = 150;
+					this.r = 100;
+					
+					this.radAngle = 0;
+					this.degAngle = 0;
+					
+					this.canvas = document.getElementById("circle-angle-measure");
+					this.ctx = this.canvas.getContext("2d");
+					
+					this.v1 = new RadialVertex(this.canvas, 150,150,100, () => {this.update()});
+				},
+				
+				clear: function() {
+					this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				},
+				
+				update: function() {
+					this.clear();
+					
+					// Draw a nice circle
+					this.ctx.beginPath();
+					this.ctx.strokeStyle = '#000'; 
+					this.ctx.fillStyle = "#eee";
+					this.ctx.beginPath();
+					this.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					this.ctx.stroke();
+					
+					// Compute the angle of the selected sector. 
+					var dx = this.v1.x - this.x;
+					var dy = this.v1.y - this.y;
+					
+					this.radAngle = Math.atan2(dy, dx);
+					if (this.radAngle < 0) {
+						this.radAngle += Math.PI * 2;
+					}
+					
+					this.degAngle = 360 - this.radAngle * 180 / Math.PI;
+					if (this.degAngle >= 360) {
+						this.degAngle = 0;
+					}
+					
+					this.ctx.font='14px verdana';
+					this.ctx.strokeText("Angle: " + Math.floor(360 - (this.radAngle * 180 / Math.PI)),10,50);
+
+					this.ctx.fillStyle = "#cce";
+					this.ctx.beginPath();
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.arc(this.x, this.y, this.r, 0, this.radAngle, true); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					
+					
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.lineTo(this.x + this.r, this.y);
+					this.ctx.stroke();
+					
+					this.v1.draw();
+				}
+			});
+		}
+		
+		function setUpVariableCircleDivisionTangle() {
+			var circleTangle = new Tangle(document.getElementById("circle-variable-division"), {
+				initialize: function () {
+					
+					this.wedgeCount = 15;
+					
+					this.r = 200;
+					this.x = this.r + 50;
+					this.y = this.r + 50;
+					
+					this.radAngle = 0;
+					this.degAngle = 0;
+					
+					this.canvas = document.getElementById("circle-variable-division-canvas");
+					this.ctx = this.canvas.getContext("2d");
+					
+					this.v1 = new RadialVertex(this.canvas, this.x,this.y,this.r, () => {this.update()});
+				},
+				
+				clear: function() {
+					this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				},
+				
+				update: function() {
+					this.clear();
+					
+					// Draw a nice circle
+					this.ctx.beginPath();
+					this.ctx.strokeStyle = '#000'; 
+					this.ctx.fillStyle = "#eee";
+					this.ctx.beginPath();
+					this.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					this.ctx.stroke();
+
+					// Draw the wedge divisions
+					this.ctx.strokeStyle = '#ccc';
+					var theta;
+					var delta = 360 / this.wedgeCount;
+					for (theta = 0; theta < 360; theta += delta)
+					{
+						var ax = this.x + this.r * Math.cos(Math.PI / 180 * theta);
+						var ay = this.y + this.r * Math.sin(Math.PI / 180 * theta);
+						this.ctx.moveTo(this.x, this.y);
+						this.ctx.lineTo(ax, ay);
+						this.ctx.stroke();
+					}
+					
+					// Compute the angle of the selected sector. 
+					var dx = this.v1.x - this.x;
+					var dy = this.v1.y - this.y;
+					
+					this.radAngle = Math.atan2(dy, dx);
+					if (this.radAngle < 0) {
+						this.radAngle += Math.PI * 2;
+					}
+					
+					// Snap the rad angle to the wedge count.
+					var phi = this.radAngle / (2 * Math.PI);
+					console.log("Phi:" + phi);
+					//this.radAngle = this.radAngle / phi;
+					console.log(this.radAngle);
+					
+					this.degAngle = 360 - this.radAngle * 180 / Math.PI;
+					if (this.degAngle >= 360) {
+						this.degAngle = 0;
+					}
+					
+					
+					this.ctx.strokeStyle = '#000';
+
+					this.ctx.font='14px verdana';
+					this.ctx.strokeText("Angle: " + Math.floor(360 - (this.radAngle * 180 / Math.PI)),10,50);
+
+					this.ctx.fillStyle = "#cce";
+					this.ctx.beginPath();
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.arc(this.x, this.y, this.r, 0, this.radAngle, true); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					
+					
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.lineTo(this.x + this.r, this.y);
+					this.ctx.stroke();
+					
+					this.v1.draw();
+				}
+			});
 		}
 		
 		function setUpAngleTangle() {
@@ -70,6 +230,7 @@
 				
 				update: function () {
 					this.ta = this.circleMeasure / 2;
+					console.log(this.ta);
 					// draw the triangle
 					
 					this.clear();
@@ -129,73 +290,6 @@
             });
         }
 		
-		function setUpCirclePieTangle () {
-			var circleTangle = new Tangle(document.getElementById("circle-angles"), {
-				initialize: function () {
-					this.x = 150;
-					this.y = 150;
-					this.r = 100;
-					
-					this.radAngle = 0;
-					this.degAngle = 0;
-					
-					this.canvas = document.getElementById("circle-angle-measure");
-					this.ctx = this.canvas.getContext("2d");
-					
-					this.v1 = new RadialVertex(this.canvas, 150,150,100, () => {this.update()});
-					
-				},
-				
-				clear: function() {
-					this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-				},
-				
-				update: function() {
-					this.clear();
-					
-					// Draw Zorro's Theorem with Movable Vertices
-					this.ctx.beginPath();
-					this.ctx.strokeStyle = '#000'; 
-					this.ctx.fillStyle = "#eee";
-					this.ctx.beginPath();
-					this.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false); 
-					this.ctx.closePath();
-					this.ctx.fill();
-					this.ctx.stroke();
-					
-					// Compute the angle of the selected sector. 
-					var dx = this.v1.x - this.x;
-					var dy = this.v1.y - this.y;
-					
-					this.radAngle = Math.atan2(dy, dx);
-					if (this.radAngle < 0) {
-						this.radAngle += Math.PI * 2;
-					}
-					
-					this.degAngle = 360 - this.radAngle * 180 / Math.PI;
-					if (this.degAngle >= 360) {
-						this.degAngle = 0;
-					}
-					
-					this.ctx.font='14px verdana';
-					this.ctx.strokeText("Angle: " + Math.floor(360 - (this.radAngle * 180 / Math.PI)),10,50);
-
-					this.ctx.fillStyle = "#cce";
-					this.ctx.beginPath();
-					this.ctx.moveTo(this.x, this.y);
-					this.ctx.arc(this.x, this.y, this.r, 0, this.radAngle, true); 
-					this.ctx.closePath();
-					this.ctx.fill();
-					
-					
-					this.ctx.moveTo(this.x, this.y);
-					this.ctx.lineTo(this.x + this.r, this.y);
-					this.ctx.stroke();
-					
-					this.v1.draw();
-				}
-			});
-		}
 
     </script>
 </head>
@@ -209,14 +303,20 @@ This is a reactive document! Please play with the things in blue! You'll get muc
 </p>
 
 <p>
-In class yesterday we introduced the idea that there's a deep and fundamental relationship between circles and triangles. Today we're going to explore that more deeply.
+In class yesterday we introduced the idea that there's a deep and fundamental relationship between circles and triangles. Today we're going to explore that a bit.
 </p>
 
 <p id="circle-angles">
-Angle measurement is all about dividing up a circle. Let's look at a circle whose angles are measured in degrees. The whole circle is 360&deg;, so the angle is a fraction of that:
+Angle measurement is all about dividing up a circle. Let's imagine that we divide a circle into 360 individual pie shaped wedges. We could then express and angle as how many of those 360 pie wedges we include together:
 </p>
 
 <canvas id="circle-angle-measure" width="400" height="300"></canvas>
+
+<p>Of course, we could pick a different number of pie wedges. The number of pie wedges we pick is just something humans have agreed on. Play with the number of pie wedges for this circle:</p>
+
+<p id="circle-variable-division" >Divide the circle into <span data-var="wedgeCount" class="TKAdjustableNumber" data-min="15" data-max="90" data-step="15"> evenly sized wedges.</span></p>
+
+<canvas id="circle-variable-division-canvas" width="600" height="500"></canvas>
 
 <h1>Angles in Right Triangles</h1>
 		
@@ -237,7 +337,7 @@ Angle measurement is all about dividing up a circle. Let's look at a circle whos
 
 <h2>Why degrees?</h2>
 		
-180&deg; seems like a fairly random number to pick for the measure of the triangle. Why 180? Why not, say, 100? or 10? Or 100,000? The answer lies in factoring. 90 is evenly divisible by 2, 3, 5, 6, 9, 10, 15, and 18. So if you want to be able to talk about fractions of a right angle, 90 is actually a really nice angle to pick! 180 is also evenly divisible by 4 and 12, so it's even better! If we picked 10, then a third of that angle would be a mess. We've called the system where the measure of the angles in a triangle is 180 the <b>degrees</b> system.
+<p>180&deg; seems like a fairly random number to pick for the measure of the triangle. Why 180? Why not, say, 100? or 10? Or 100,000? The answer lies in factoring. 90 is evenly divisible by 2, 3, 5, 6, 9, 10, 15, and 18. So if you want to be able to talk about fractions of a right angle, 90 is actually a really nice angle to pick! 180 is also evenly divisible by 4 and 12, so it's even better! If we picked 10, then a third of that angle would be a mess. We've called the system where the measure of the angles in a triangle is 180 the <b>degrees</b> system.</p>
 		
 <h2>So, what else is there?</h2>
 
