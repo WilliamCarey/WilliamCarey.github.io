@@ -1,5 +1,13 @@
 // Drawing utilities
 
+(function() {
+	var WDCDraggableVertex = this.WDCDraggableVertex = new Class ({
+		initialize: function(canvas, delegate) {
+			
+		}
+	});	
+})();
+
 function DraggableVertex(canvas, x, y, freedom, updateNotifier)
 {
 	this.ctx = canvas.getContext("2d");

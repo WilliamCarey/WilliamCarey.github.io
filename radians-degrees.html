@@ -1,0 +1,310 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<title>Angle Measurement</title>
+	
+	<link rel="StyleSheet" href="css/document.css" media="screen">
+	<link rel="StyleSheet" href="css/print.css" media="print">
+	<link rel="stylesheet" href="TangleKit/TangleKit.css" type="text/css">
+	
+	<script type="text/javascript" src="Tangle.js"></script>
+
+	<!-- TangleKit (optional) -->
+	<script type="text/javascript" src="TangleKit/mootools.js"></script>
+	<script type="text/javascript" src="TangleKit/sprintf.js"></script>
+	<script type="text/javascript" src="TangleKit/BVTouchable.js"></script>
+	<script type="text/javascript" src="TangleKit/TangleKit.js"></script>
+
+	<script type="text/javascript" src="draggable-vertex.js"></script>
+	<script type="text/javascript" src="radial-vertex.js"></script>
+
+	<style>
+		body {
+			margin: 20px;
+			padding: 0px;
+		}
+
+	</style>
+	
+	<script type="text/javascript">
+		
+		function setUpTangles () {
+			setUpCirclePieTangle();
+			setUpVariableCircleDivisionTangle();
+			setUpAngleTangle();
+			setUpTriangleTangle();
+		}
+		
+		function setUpCirclePieTangle () {
+			var circleTangle = new Tangle(document.getElementById("circle-angles"), {
+				initialize: function () {
+					this.x = 150;
+					this.y = 150;
+					this.r = 100;
+					
+					this.radAngle = 0;
+					this.degAngle = 0;
+					
+					this.canvas = document.getElementById("circle-angle-measure");
+					this.ctx = this.canvas.getContext("2d");
+					
+					this.v1 = new RadialVertex(this.canvas, 150,150,100, () => {this.update()});
+				},
+				
+				clear: function() {
+					this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				},
+				
+				update: function() {
+					this.clear();
+					
+					// Draw a nice circle
+					this.ctx.beginPath();
+					this.ctx.strokeStyle = '#000'; 
+					this.ctx.fillStyle = "#eee";
+					this.ctx.beginPath();
+					this.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					this.ctx.stroke();
+					
+					// Compute the angle of the selected sector. 
+					var dx = this.v1.x - this.x;
+					var dy = this.v1.y - this.y;
+					
+					this.radAngle = Math.atan2(dy, dx);
+					if (this.radAngle < 0) {
+						this.radAngle += Math.PI * 2;
+					}
+					
+					this.degAngle = 360 - this.radAngle * 180 / Math.PI;
+					if (this.degAngle >= 360) {
+						this.degAngle = 0;
+					}
+					
+					this.ctx.font='14px verdana';
+					this.ctx.strokeText("Angle: " + Math.floor(360 - (this.radAngle * 180 / Math.PI)),10,50);
+
+					this.ctx.fillStyle = "#cce";
+					this.ctx.beginPath();
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.arc(this.x, this.y, this.r, 0, this.radAngle, true); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					
+					
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.lineTo(this.x + this.r, this.y);
+					this.ctx.stroke();
+					
+					this.v1.draw();
+				}
+			});
+		}
+		
+		function setUpVariableCircleDivisionTangle() {
+			var circleTangle = new Tangle(document.getElementById("circle-variable-division"), {
+				initialize: function () {
+					
+					this.wedgeCount = 15;
+					
+					this.r = 200;
+					this.x = this.r + 50;
+					this.y = this.r + 50;
+					
+					this.radAngle = 0;
+					this.degAngle = 0;
+					
+					this.canvas = document.getElementById("circle-variable-division-canvas");
+					this.ctx = this.canvas.getContext("2d");
+					
+					this.v1 = new RadialVertex(this.canvas, this.x,this.y,this.r, () => {this.update()});
+				},
+				
+				clear: function() {
+					this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				},
+				
+				update: function() {
+					this.clear();
+					
+					// Draw a nice circle
+					this.ctx.beginPath();
+					this.ctx.strokeStyle = '#000'; 
+					this.ctx.fillStyle = "#eee";
+					this.ctx.beginPath();
+					this.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					this.ctx.stroke();
+
+					// Draw the wedge divisions
+					this.ctx.strokeStyle = '#ccc';
+					var theta;
+					var delta = 360 / this.wedgeCount;
+					for (theta = 0; theta < 360; theta += delta)
+					{
+						var ax = this.x + this.r * Math.cos(Math.PI / 180 * theta);
+						var ay = this.y + this.r * Math.sin(Math.PI / 180 * theta);
+						this.ctx.moveTo(this.x, this.y);
+						this.ctx.lineTo(ax, ay);
+						this.ctx.stroke();
+					}
+					
+					// Compute the angle of the selected sector. 
+					var dx = this.v1.x - this.x;
+					var dy = this.v1.y - this.y;
+					
+					this.radAngle = Math.atan2(dy, dx);
+					if (this.radAngle < 0) {
+						this.radAngle += Math.PI * 2;
+					}
+					
+					// Snap the rad angle to the wedge count.
+					var phi = this.radAngle / (2 * Math.PI);
+					console.log("Phi:" + phi);
+					//this.radAngle = this.radAngle / phi;
+					console.log(this.radAngle);
+					
+					this.degAngle = 360 - this.radAngle * 180 / Math.PI;
+					if (this.degAngle >= 360) {
+						this.degAngle = 0;
+					}
+					
+					
+					this.ctx.strokeStyle = '#000';
+
+					this.ctx.font='14px verdana';
+					this.ctx.strokeText("Angle: " + Math.floor(360 - (this.radAngle * 180 / Math.PI)),10,50);
+
+					this.ctx.fillStyle = "#cce";
+					this.ctx.beginPath();
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.arc(this.x, this.y, this.r, 0, this.radAngle, true); 
+					this.ctx.closePath();
+					this.ctx.fill();
+					
+					
+					this.ctx.moveTo(this.x, this.y);
+					this.ctx.lineTo(this.x + this.r, this.y);
+					this.ctx.stroke();
+					
+					this.v1.draw();
+				}
+			});
+		}
+		
+		function setUpAngleTangle() {
+			var numberTangle = new Tangle(document.getElementById("angle-tangle"),
+			{
+				initialize: function () {
+					this.ra = 7.24;
+					this.ta = this.ra * 2;
+				},
+				
+				update: function () {
+					this.ta = this.ra * 2;
+				}
+			});
+		}
+		
+		function setUpTriangleTangle () {
+			var triangleTangle = new Tangle(document.getElementById("triangle-tangle"), {
+				initialize: function () {
+					this.circleMeasure = 360;
+					this.ta = 180;
+					
+					this.canvas = document.getElementById("angle-measure");
+					this.ctx = this.canvas.getContext("2d");
+
+					this.v1 = new DraggableVertex(this.canvas, 180,50,"HORIZONTAL", () => {this.update()});
+					this.v2 = new DraggableVertex(this.canvas, 60,250,"HORIZONTAL", () => {this.update()});
+					this.v3 = new DraggableVertex(this.canvas, 320,250,"HORIZONTAL", () => {this.update()});
+				},
+				
+				clear: function() {
+					this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				},
+				
+				update: function () {
+					this.ta = this.circleMeasure / 2;
+					console.log(this.ta);
+					// draw the triangle
+					
+					this.clear();
+					
+					// Draw Zorro's Theorem with Movable Vertices
+					this.ctx.beginPath();
+					this.ctx.strokeStyle = '#000'; 
+
+					// Draw the parallel lines.
+					this.ctx.moveTo(20,50);
+					this.ctx.lineTo(380,50);
+					this.ctx.moveTo(20,250);
+					this.ctx.lineTo(380,250);
+
+					// Connect the triangle -- only two legs
+					this.ctx.moveTo(this.v1.x,this.v1.y);
+					this.ctx.lineTo(this.v2.x,this.v2.y);
+
+					this.ctx.moveTo(this.v1.x,this.v1.y);
+					this.ctx.lineTo(this.v3.x,this.v3.y);
+
+					this.ctx.stroke();
+
+					// Draw the Triangle Sliders
+					this.v1.draw()
+					this.v2.draw()
+					this.v3.draw()
+
+					// Label the angles
+					this.ctx.fillStyle = '#000';
+					this.ctx.font = "14px Helvetica";
+					
+					// To calculate the offset: calculate the angle, divide by two, add enough to get it in place.
+					var angleTheta = Math.atan2(this.v2.y - this.v1.y, this.v1.x - this.v2.x);
+					offsetAngle = angleTheta / 2;
+					oy = 30;
+					ox = oy / Math.tan(offsetAngle);
+					
+					this.ctx.fillText(Math.round(angleTheta * this.ta / Math.PI).toString(), this.v1.x - ox, 50 + oy);
+
+					// To calculate the offset: calculate the angle, divide by two, add enough to get it in place.
+					var anglePhi = Math.PI - Math.atan2(this.v3.y - this.v1.y, this.v1.x - this.v3.x);
+					offsetAngle = anglePhi / 2;
+					oy = 30;
+					ox = oy / Math.tan(offsetAngle);
+					
+					this.ctx.fillText(Math.round(anglePhi * this.ta / Math.PI).toString(), this.v1.x + ox, 50 + oy);
+
+					var angleRho = Math.PI - anglePhi - angleTheta; // Right?
+					var offsetAngle = angleTheta + angleRho / 2
+					oy = 40;
+					ox = oy / Math.tan(offsetAngle);
+					
+					this.ctx.fillText(Math.round(angleRho * this.ta / Math.PI).toString(), this.v1.x - ox - 10, 50 + oy);
+
+                }
+            });
+        }
+		
+
+    </script>
+</head>
+		
+<body onload="setUpTangles();">
+
+<p class="caution">
+This is a reactive document! Please play with the things in blue! You'll get much more out of this if you play around a bit. I know it works on a full computer. Probably not on touch based devices.
+</p>
+
+<h1>Radians and Degrees</h1>
+
+<p>
+Radians and degrees are two ways of describing the measure of an angle. They can be used interchangably, and each has advantages and disadvantages. Let's take a look at equivalent angles in radians and 
+</p>
+
+</body>
+</html> 
