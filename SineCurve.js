@@ -31,7 +31,8 @@ class SineCurve {
 
 		// update
 		this.angle += (this.angularSpeed * dt / 1000) % 360;
-
+		this.angle %= 360;
+		
 		// redraw
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.drawSineCurve(this.context);
