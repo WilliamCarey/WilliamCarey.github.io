@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+	body {
+		margin: 20px;
+		padding: 0px;
+	}
+	
+	canvas {
+		border: 1px black solid;
+	}
+	
+	</style>
+		
+	<script type="text/javascript" src="UnitCircle.js"> </script>
+	<script type="text/javascript" src="SineCurve.js"> </script>
+
+	<script type="text/javascript">
+
+function initializeAnimatedUnitCircle() {
+	window.requestAnimFrame = (function(callback) {
+		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+		function(callback) {
+			window.setTimeout(callback, 1000 / 60);
+		};
+	})();
+
+	var unitCircle = new UnitCircle(document.getElementById('animated-unit-circle'), { 
+		angleDidChange : function(angle) {
+			if (angle < 45.3 && angle > 44.9) {
+				unitCircle.pause();
+				sineCurve.pause();
+			}
+		}
+	});
+	unitCircle.startAnimation();
+
+	var sineCurve = new SineCurve(document.getElementById('animated-sine-curve'), this);
+	sineCurve.startAnimation();
+
+	document.onkeydown = function(event) {
+	    var x = window.event ? window.event : e;
+	    console.log(x.keyCode);
+	
+		if (x.keyCode === 80) {
+			unitCircle.togglePaused();
+			sineCurve.togglePaused();
+		}
+	}	
+
+
+}
+
+</script>
+
+</head>
+	
+<body onload="initializeAnimatedUnitCircle();">
+	<p>Dear Students - This is a series of visualizations of the function f(x) = sin(x). Do play around with them a bit! The length of the red line is a function of the angle in the triangle. Well, there's not much interactivity yet, but do watch the animation and think about what it means! You can push the 'P' key to pause and unpause the animation. Try pausing and unpausing it!</p>
+
+	<canvas id="animated-unit-circle" width="600" height="600"></canvas>
+	<canvas id="animated-sine-curve" width="600" height="600"></canvas>
+
+</body>
+
+</html> 

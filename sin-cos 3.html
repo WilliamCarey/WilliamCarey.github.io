@@ -14,15 +14,14 @@
 	</canvas>
 
 <script>
-
-window.requestAnimFrame = (function(callback) {
-	return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+	window.requestAnimFrame = (function(callback) {
+		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
 	function(callback) {
 		window.setTimeout(callback, 1000 / 60);
 	};
 })();
 
-function drawSinSlider(circle, context) {
+function drawSinSlider(context, circle) {
 	
 	dy = circle.y - circle.r * Math.sin(circle.a * Math.PI / 180.0);
 	dx = circle.x + circle.r + 20
@@ -67,7 +66,7 @@ function drawCosSlider(circle, context) {
 
 function drawParameters(circle, time, context) {
 	context.font = context.font.replace(/\d+px/, "18px");
-	context.strokeText("Angle: " + Math.floor(circle.a),10,50);
+	context.strokeText("Angle: " + Math.floor(circle.a % 360),10,50);
 	context.strokeText("Time: " + Math.floor(time),10,80);
 }
 
