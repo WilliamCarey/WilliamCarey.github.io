@@ -77,21 +77,38 @@ class SineCurve {
 		// Calculate the angular offset to draw the vertical highlight.
 		var rx = (this.angle % 360) / 360.0 * this.xScale;
 		
+		var sinHeight = Math.sin(this.angle * Math.PI / 180.0) * this.yScale / 2
+		
 		context.beginPath();
 		context.strokeStyle = '#F00';
 		context.lineWidth = 5;
 		context.moveTo(this.origin.x + rx, this.origin.y);
-		context.lineTo(this.origin.x + rx, this.origin.y - Math.sin(this.angle * Math.PI / 180.0) * this.yScale / 2)
+		context.lineTo(this.origin.x + rx, this.origin.y - sinHeight)
 		context.stroke();
 
+		// Draw the horizontal highlight for the angle
 		context.beginPath();
-		
 		context.strokeStyle = '#00F';
 		context.lineWidth = 5;
 		context.moveTo(this.origin.x, this.origin.y);
 		context.lineTo(this.origin.x + rx, this.origin.y);
-		
 		context.stroke();
+		
+		if (this.paused)
+		{
+			var displayAngle = Math.round(this.angle);
+			
+			context.font = context.font.replace(/\d+px/, "18px");
+			context.fillStyle = "#333";
+			
+			var displayX = this.origin.x + 20;
+			var displayY = Math.trunc(Math.sin(displayAngle * Math.PI / 180.0) * 1000) / 1000;
+			
+			context.fillText(`${displayY}`,this.origin.x + rx + 5,this.origin.y-(sinHeight / 2));
+			context.fillText(`${displayAngle}\xB0`,this.origin.x+rx/2 - 10,this.origin.y+20);
+
+		}
+		
 	}
 
 	startAnimation() {
