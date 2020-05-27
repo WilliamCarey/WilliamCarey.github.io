@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<meta content = "text/html; charset = ISO-8859-1" http-equiv = "content-type">
+		
+	
+		<link rel="StyleSheet" href="css/document.css" media="screen">
+		<link rel="StyleSheet" href="css/print.css" media="print">
+		<link rel="stylesheet" href="TangleKit/TangleKit.css" type="text/css">
+	
+		<script type="text/javascript" src="Tangle.js"></script>
+
+		<!-- TangleKit (optional) -->
+		<script type="text/javascript" src="TangleKit/mootools.js"></script>
+		<script type="text/javascript" src="TangleKit/sprintf.js"></script>
+		<script type="text/javascript" src="TangleKit/BVTouchable.js"></script>
+		<script type="text/javascript" src="TangleKit/TangleKit.js"></script>
+
+		<script type="text/javascript" src="draggable-vertex.js"></script>
+		<script type="text/javascript" src="radial-vertex.js"></script>
+		
+		<script type = "application/javascript">
+			
+			function loadJSON() {
+				var data_file = "http://www.thelatinlibrary.com/physics/math/ships.json";
+				var http_request = new XMLHttpRequest();
+
+				http_request.onreadystatechange = function() {
+					if (http_request.readyState == 4) {
+						var jsonObj = JSON.parse(http_request.responseText);
+						console.log(jsonObj);
+					}
+				}
+				http_request.open("GET", data_file, true);
+				http_request.send();
+			}
+		  
+		</script>
+	 	<style>
+			body {
+				margin: 20px;
+				padding: 0px;
+			}
+
+		</style>
+		
+		<title>Naval Battle of Guadalcanal</title>
+		
+	</head>
+	 
+	<body>
+		<h1>The Naval Battle of Guadalcanal</h1>
+
+		<div class = "central">
+			<button type = "button" onclick = "loadJSON()">Update Details </button>
+		</div>
+	
+	</body>
+	
+</html>
