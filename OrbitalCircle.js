@@ -15,6 +15,10 @@ class OrbitalCircle {
 		
 		this.frontAngle = 24; /* Measured in degrees */
 		this.backAngle = 0; /* Measured in degrees */
+		
+		this.apparentFrontAngle = 0;
+		this.apparentBackAngle = 0;
+				
 		this.angularSpeed = 10; /* Measured in degrees per second */
 
 		this.paused = false;
@@ -86,9 +90,9 @@ class OrbitalCircle {
 		var bdx = this.center.x + this.radius * Math.cos(this.backAngle * Math.PI / 180.0);
 		var bdy = this.center.y - this.radius * Math.sin(this.backAngle * Math.PI / 180.0);
 
-		var apparentFrontAngle = Math.atan2(this.radius * Math.sin(this.frontAngle * Math.PI / 180.0) + this.deferent, this.radius * Math.cos(this.frontAngle * Math.PI / 180.0)) * 180.0 / Math.PI;
+		this.apparentFrontAngle = Math.atan2(this.radius * Math.sin(this.frontAngle * Math.PI / 180.0) + this.deferent, this.radius * Math.cos(this.frontAngle * Math.PI / 180.0)) * 180.0 / Math.PI;
 		
-		var apparentBackAngle = Math.atan2(this.radius * Math.sin(this.backAngle * Math.PI / 180.0) + this.deferent, this.radius * Math.cos(this.backAngle * Math.PI / 180.0)) * 180.0 / Math.PI;
+		this.apparentBackAngle = Math.atan2(this.radius * Math.sin(this.backAngle * Math.PI / 180.0) + this.deferent, this.radius * Math.cos(this.backAngle * Math.PI / 180.0)) * 180.0 / Math.PI;
 
 		// Draw the observed position from the center of the orbit.
 		context.beginPath();
@@ -128,7 +132,7 @@ class OrbitalCircle {
 		context.beginPath();
 		context.lineWidth = 5;
 				
-		context.arc(this.center.x, this.center.y + this.deferent, this.radius - this.deferent, (360 - apparentBackAngle) * Math.PI / 180.0, (360 - apparentFrontAngle) * Math.PI / 180.0, true); 
+		context.arc(this.center.x, this.center.y + this.deferent, this.radius - this.deferent, (360 - this.apparentBackAngle) * Math.PI / 180.0, (360 - this.apparentFrontAngle) * Math.PI / 180.0, true); 
 		context.stroke();
 		
 		// Draw the unit circle
