@@ -32,7 +32,7 @@
 
 var upFront = "discrete"
 
-function initializeDraggableParabola() {
+function initializeParabolas() {
 	window.requestAnimFrame = (function(callback) {
 		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
 		function(callback) {
@@ -109,19 +109,22 @@ function showContinuous() {
 
 </head>
 	
-<body onload="initializeDraggableParabola();">
+<body onload="initializeParabolas();">
+	<h2>The Quadratic Property of the Parabola</h2>
+	
+	<p>The parabola is a <i>conic section</i>, a figure produced by cutting a cone with a plane. One of its better known properties is that it embodies a quadratic proportionality.</p>
+	
 	<p>This is a playground to explore the quadratic property of the parabola. Use the "w" and "s" keys to change the area of the rectangle.</p>
 
 	<p>
-		<button id="discrete" onClick="showDiscrete()">Show Discrete</button>
-		<button id="continuous" onClick="showContinuous()">Show Continuous</button>
+		<button id="discrete" onClick="showDiscrete();">Show Discrete</button>
+		<button id="continuous" onClick="showContinuous();">Show Continuous</button>
 	</p>
 
 	<div id="wrapper">
 		<canvas class="discrete" id="draggable-square-parabola-discrete" width="600" height="600"></canvas>
 		<canvas class="continuous" id="draggable-square-parabola-continuous" width="600" height="600"></canvas>
 	</div>
-	
 </body>
 
 </html> 
