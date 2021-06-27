@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+	body {
+		margin: 20px;
+		padding: 0px;
+	}
+	
+	canvas {
+		border: 1px black solid;
+	}
+
+	#wrapper {
+		position: relative;
+	}
+	
+	#draggable-square-parabola-discrete {
+		position: absolute; 
+	}
+	
+	#draggable-square-parabola-continuous{
+		position: absolute;
+	}
+	
+	</style>
+		
+	<script type="text/javascript" src="DiscreteParabola.js"> </script>
+	<script type="text/javascript" src="ContinuousParabola.js"> </script>
+
+	<script type="text/javascript">
+
+var upFront = "discrete"
+
+function initializeDraggableParabola() {
+	window.requestAnimFrame = (function(callback) {
+		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+		function(callback) {
+			window.setTimeout(callback, 1000 / 60);
+		};
+	})();
+
+	var discreteParabola = new DiscreteParabola(document.getElementById('draggable-square-parabola-discrete'), null);
+	discreteParabola.startAnimation();
+
+	var continuousParabola = new ContinuousParabola(document.getElementById('draggable-square-parabola-continuous'), null);
+	continuousParabola.startAnimation();
+
+	document.onkeydown = function(event) {
+	    var x = window.event ? window.event : e;
+	
+		if (x.keyCode === 87) {
+			if (upFront == "discrete")
+			{
+				discreteParabola.numSquares += 1;				
+			}
+			else
+			{
+				continuousParabola.height += 1;
+			}
+		}
+		
+		if (x.keyCode === 83) {
+			if (upFront == "discrete")
+			{
+				if (discreteParabola.numSquares > 0)
+				{
+					discreteParabola.numSquares -= 1;
+				}				
+			}
+			else
+			{
+				if (continuousParabola.height > 0)
+				{
+					continuousParabola.height -= 1;
+				}
+			}
+		}		
+	}	
+
+
+}
+
+function showDiscrete() {
+	console.log("Showing Discrete")
+
+	var discrete = document.getElementById('draggable-square-parabola-discrete');
+	var continuous = document.getElementById('draggable-square-parabola-continuous');
+	
+	discrete.style.visibility='visible';
+	continuous.style.visibility='hidden';
+
+	upFront = "discrete"
+}
+
+function showContinuous() {
+	console.log("Showing Continuous")
+
+	var discrete = document.getElementById('draggable-square-parabola-discrete');
+	var continuous = document.getElementById('draggable-square-parabola-continuous');
+	
+	discrete.style.visibility='hidden';
+	continuous.style.visibility='visible';	
+
+	upFront = "continuous"
+}
+
+</script>
+
+</head>
+	
+<body onload="initializeDraggableParabola();">
+	<p>This is a playground to explore the quadratic property of the parabola. Use the "w" and "s" keys to change the area of the rectangle.</p>
+
+	<p>
+		<button id="discrete" onClick="showDiscrete()">Show Discrete</button>
+		<button id="continuous" onClick="showContinuous()">Show Continuous</button>
+	</p>
+
+	<div id="wrapper">
+		<canvas class="discrete" id="draggable-square-parabola-discrete" width="600" height="600"></canvas>
+		<canvas class="continuous" id="draggable-square-parabola-continuous" width="600" height="600"></canvas>
+	</div>
+	
+</body>
+
+</html> 
