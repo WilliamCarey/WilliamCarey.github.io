@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+	body {
+		margin: 20px;
+		padding: 0px;
+	}
+	
+	canvas {
+		border: 1px black solid;
+	}
+	
+	</style>
+		
+	<script type="text/javascript" src="OrbitalCircle.js"> </script>
+	<script type="text/javascript" src="DeferentCurve.js"> </script>
+
+	<script type="text/javascript">
+
+function initializeAnimatedUnitCircle() {
+	window.requestAnimFrame = (function(callback) {
+		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+		function(callback) {
+			window.setTimeout(callback, 1000 / 60);
+		};
+	})();
+
+	var orbitalCircle = new OrbitalCircle(document.getElementById('animated-unit-circle'), { 
+		angleDidChange : function(frontAngle, backAngle) {
+
+		}
+	});
+	orbitalCircle.startAnimation();
+
+	var deferentCurve = new DeferentCurve(document.getElementById('animated-sine-curve'), this, orbitalCircle);
+	deferentCurve.startAnimation();
+
+	document.onkeydown = function(event) {
+	    var x = window.event ? window.event : e;
+	    console.log(x.keyCode);
+	
+		if (x.keyCode === 87) {
+			orbitalCircle.deferent += 10;
+
+			if (orbitalCircle.deferent >= orbitalCircle.radius) {
+				orbitalCircle.deferent = orbitalCircle.radius - 10;
+			}
+
+		}
+		
+		if (x.keyCode === 83) {
+			orbitalCircle.deferent -= 10;
+			
+			if (orbitalCircle.deferent <= 0) {
+				orbitalCircle.deferent = 0;
+			}
+		}
+	}	
+
+
+}
+
+</script>
+
+</head>
+	
+<body onload="initializeAnimatedUnitCircle();">
+	<p>This is a playground to dork around with deferents. You can use the w and s keys to change the magnitude of the deferent. The green is the apparent angular velocity of the planet as measured from the earth. The blue is the true angular velocity as measured from the center of the orbit.</p>
+
+	<canvas id="animated-unit-circle" width="600" height="600"></canvas>
+	<canvas id="animated-sine-curve" width="600" height="600"></canvas>
+
+</body>
+
+</html> 

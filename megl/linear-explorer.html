@@ -1,0 +1,263 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+	body {
+		margin: 20px;
+		padding: 0px;
+	}
+	
+	canvas {
+		border: 1px black solid;
+	}
+	
+	table {
+		border: 1px black solid;
+	}
+	
+	td.selected {
+		background-color: #f0f000;
+	}
+	
+	table.subword {
+		float: left;
+		margin-left: 20px;
+	}
+	
+	table.present {
+		background-color: #ccfccc;
+	}
+	
+	table.too-many {
+		background-color: #fccccc;
+	}
+	</style>
+		
+	<script type="text/javascript">
+
+var subwords = ["00", "01", "10", "11"]
+
+class Subword {
+	constructor(parentElement, delegate, value)
+	{
+		this.parentElement = parentElement
+		this.delegate = delegate
+		
+		this.value = value
+		this.values = value.split("")
+		this.length = this.values.length
+		this.isPresentOnce = false	
+			
+		
+		this.cells = Array.from({length: this.length})
+		this.table = document.createElement("table");
+		this.table.classList.add("subword")
+		const row = document.createElement("tr")
+		this.table.appendChild(row)		
+		
+		for (var i = 0; i < this.length; i++)
+		{
+			this.cells[i] = document.createElement("td")
+			this.cells[i].innerHTML = this.values[i]
+			row.appendChild(this.cells[i])
+		}
+		
+		this.parentElement.appendChild(this.table)
+		
+		this.update()
+	}
+	
+	update()
+	{
+		this.table.classList.remove("present");
+		this.table.classList.remove("too-many")
+
+		this.isPresentOnce = false;
+		let count = this.delegate.subwordCount(this.values.join(""))
+		if (count == 1)
+		{
+			this.table.classList.add("present");
+			this.isPresentOnce = true;
+		}
+		else if (count > 1)
+		{
+			this.table.classList.add("too-many")
+			this.isPresentOnce = false;
+		}
+	}
+}
+
+class LinearCycle {
+	constructor(parentElement, delegate, len)
+	{
+		this.parentElement = parentElement
+		this.delegate = delegate
+		this.selectedIndex = 0
+		
+		
+		this.length = len
+				
+		this.values = Array.from({ length: this.length})
+		this.cells = Array.from({ length: this.length})
+
+		const table = document.createElement("table");
+		const row = document.createElement("tr")
+		table.appendChild(row)		
+		
+		for (var i = 0; i < this.length; i++)
+		{
+			this.values[i] = "0"
+			this.cells[i] = document.createElement("td")
+			this.cells[i].innerHTML = this.values[i]
+			row.appendChild(this.cells[i])
+		}
+		
+		this.parentElement.appendChild(table)
+		
+		this.update()
+	}
+
+	valueAsUniversalWord(sw)
+	{
+		var a = this.values.join("")
+		a += a.slice(0, sw.length - 1)
+		return a
+	}
+
+	subwordCount(sw)
+	{
+		s = this.valueAsUniversalWord(sw)
+		m = Array.from(s.slice(1), (_, i) => s.slice(i, i+2))
+		return m.filter(x => x == sw).length
+	}
+	
+	// User interface stuff
+	incrementSelectedIndex()
+	{
+		this.selectedIndex += 1
+		if (this.selectedIndex == this.length)
+		{
+			this.selectedIndex = 0
+		}
+		this.update()
+	}
+
+	decrementSelectedIndex()
+	{
+		this.selectedIndex -= 1
+		if (this.selectedIndex < 0)
+		{
+			this.selectedIndex = this.length - 1
+		}
+		this.update()
+	}
+	
+	flipSelectedValue()
+	{
+		if (this.values[this.selectedIndex] == "0")
+			this.values[this.selectedIndex] = "1"
+		else
+			this.values[this.selectedIndex] = "0"
+		this.update()
+		
+		this.delegate.updateSubwordPresence()
+	}
+	
+	update()
+	{
+		for (var i = 0; i < this.length; i++)
+		{
+			this.cells[i].innerHTML = this.values[i]
+			this.cells[i].className = "unselected"
+	
+			if (i == this.selectedIndex)
+				this.cells[i].className = "selected"
+		}
+	}
+
+}
+
+class DelegationHandler
+{
+	constructor(cw, sws) {
+		this.cw = cw
+		this.sws = sws
+	}
+	
+	setSws(sws) {
+		this.sws = sws
+	}
+	
+	updateSubwordPresence()
+	{
+		document.getElementById("happy-cat").hidden=false
+		this.sws.forEach((element) => 
+		{
+			element.update()
+			if (!element.isPresentOnce)
+			{
+				document.getElementById("happy-cat").hidden=true;
+			}
+		});	
+	}
+}
+
+function initializeDeBruijn() {
+	s = "000110"
+	m = Array.from(s.slice(1), (_, i) => s.slice(i, i+2))
+	console.log(m)
+	
+	cw = document.getElementById('cyclicWord')
+	sws = document.getElementById('subwords')
+	dh = new DelegationHandler(null, null)
+	ls = new LinearCycle(cw, dh, 4)
+	
+	swobjs = [];
+	subwords.forEach((element) =>
+	{
+		sw = new Subword(sws, ls, element)
+		swobjs.push(sw)
+	}
+	);
+	
+	dh.cw = ls
+	dh.setSws(swobjs)
+	dh.updateSubwordPresence()
+	
+	document.onkeydown = function(event) {
+	    var x = window.event ? window.event : e;
+		if (x.keyCode === 38 || x.keyCode === 40) {
+			ls.flipSelectedValue()
+		}
+		if (x.keyCode === 37)
+		{
+			ls.decrementSelectedIndex();
+		}
+		if (x.keyCode === 39)
+		{
+			ls.incrementSelectedIndex();
+		}
+	}
+}
+</script>
+
+</head>
+	
+<body onload="initializeDeBruijn();">
+	<p>This is a playground to explore the cycle shifting method of generating a debruijn torus. The left and right arrows change which element of the candidate cyclic word is selected and the up and down arrows flip that bit. If the subword is present, it turns green. If all the subwords are present exactly once, a happy cat appears.</p>
+
+</body>
+
+<div id="cyclicWord"> </div>
+<br>
+<br>
+<div id="subwords"> </div>
+
+<br>
+<br>
+<br>
+<br>
+
+<img id="happy-cat" src="cat-in-repose.jpg">
+
+</html> 

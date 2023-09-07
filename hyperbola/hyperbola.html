@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+	body {
+		margin: 20px;
+		padding: 0px;
+	}
+	
+	canvas {
+		border: 1px black solid;
+	}
+
+	#wrapper {
+		position: relative;
+	}
+	
+	#hyperbola-discrete {
+		position: absolute; 
+	}
+	
+	#hyperbola-continuous{
+		position: absolute;
+	}
+	
+	</style>
+		
+	<script type="text/javascript" src="DiscreteHyperbola.js"> </script>
+	<script type="text/javascript" src="ContinuousHyperbola.js"> </script>
+
+	<script type="text/javascript">
+
+var upFront = "continuous"
+
+function initializeHyperbolas() {
+	window.requestAnimFrame = (function(callback) {
+		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+		function(callback) {
+			window.setTimeout(callback, 1000 / 60);
+		};
+	})();
+
+	var discreteHyperbola = new DiscreteHyperbola(document.getElementById('hyperbola-discrete'), null);
+	discreteHyperbola.startAnimation();
+
+	var continuousHyperbola = new ContinuousHyperbola(document.getElementById('hyperbola-continuous'), null);
+	continuousHyperbola.startAnimation();
+
+	document.onkeydown = function(event) {
+	    var x = window.event ? window.event : e;
+	
+		if (x.keyCode === 87) {
+			if (upFront == "discrete")
+			{
+				discreteHyperbola.numSquares += 1;				
+			}
+			else
+			{
+				continuousHyperbola.height += 1;
+			}
+		}
+		
+		if (x.keyCode === 83) {
+			if (upFront == "discrete")
+			{
+				if (discreteHyperbola.numSquares > 0)
+				{
+					discreteHyperbola.numSquares -= 1;
+				}				
+			}
+			else
+			{
+				if (continuousHyperbola.height > 0)
+				{
+					continuousHyperbola.height -= 1;
+				}
+			}
+		}		
+	}	
+
+	showContinuous();
+}
+
+function showDiscrete() {
+	console.log("Showing Discrete")
+
+	var discrete = document.getElementById('hyperbola-discrete');
+	var continuous = document.getElementById('hyperbola-continuous');
+	
+	discrete.style.visibility='visible';
+	continuous.style.visibility='hidden';
+
+	upFront = "discrete"
+}
+
+function showContinuous() {
+	console.log("Showing Continuous")
+
+	var discrete = document.getElementById('hyperbola-discrete');
+	var continuous = document.getElementById('hyperbola-continuous');
+	
+	discrete.style.visibility='hidden';
+	continuous.style.visibility='visible';	
+
+	upFront = "continuous"
+}
+
+</script>
+
+</head>
+	
+<body onload="initializeHyperbolas();">
+	<h2>The Quadratic (?) Property of the Hyperbola</h2>
+		
+	<p>This is a playground to explore the quadratic property of the hyperbola. Use the "w" and "s" keys to change the area of the rectangle.</p>
+
+	<p>
+		<button id="discrete" onClick="showDiscrete();">Show Discrete</button>
+		<button id="continuous" onClick="showContinuous();">Show Continuous</button>
+	</p>
+
+	<div id="wrapper">
+		<canvas class="discrete" id="hyperbola-discrete" width="600" height="600"></canvas>
+		<canvas class="continuous" id="hyperbola-continuous" width="600" height="600"></canvas>
+	</div>
+</body>
+
+</html> 

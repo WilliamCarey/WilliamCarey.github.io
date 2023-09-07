@@ -1,0 +1,373 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+	body {
+		margin: 20px;
+		padding: 0px;
+	}
+	
+	canvas {
+		border: 1px black solid;
+	}
+	
+	table {
+		border: 1px black solid;
+	}
+	
+	td.selected {
+		background-color: #f0f000;
+	}
+	
+	table.subword {
+		float: left;
+		margin-left: 20px;
+	}
+	
+	table.present {
+		background-color: #ccfccc;
+	}
+	
+	table.too-many {
+		background-color: #fccccc;
+	}
+	</style>
+		
+	<script type="text/javascript">
+
+// This should be automatically generated from user configurable parameters, probably.
+var subwords = ["0000", "0001", "0010", "0100", "1000", "0011", "0110", "1100", "1001", "0101", "1010", "0111", "1011","1101", "1110", "1111"]
+
+class SquareSubword {
+	constructor(parentElement, delegate, value)
+	{
+		this.parentElement = parentElement
+		this.delegate = delegate
+		
+		this.text = value.split("")
+		this.isPresentOnce = false	
+			
+		this.values = Array.from({ length: 4})
+		this.rows = Array.from({length: 2})
+		this.cells = Array.from({ length: 4})
+				
+		this.table = document.createElement("table");
+		this.table.classList.add("subword")
+		
+		// ugh hardcoding makes me feel bad. will fix later
+		for (var row = 0; row < 2; row++)
+		{
+			this.rows[row] = document.createElement("tr")
+			
+			for (var column = 0; column < 2; column++)
+			{
+				this.setValueAt(row, column, this.text[2 * row + column])
+				this.cells[2 * row + column] = document.createElement("td")
+				this.cells[2 * row + column].innerHTML = this.valueAt(row, column)
+				this.rows[row].appendChild(this.cells[2 * row + column])
+			}
+			this.table.appendChild(this.rows[row])		
+		}
+		
+		this.parentElement.appendChild(this.table)
+		
+		this.update()
+	}
+	
+	setValueAt(row, column, value)
+	{
+		this.values[2 * row + column] = value
+	}
+
+	valueAt(row, column)
+	{
+		return this.values[2 * row + column]
+	}
+	
+	update()
+	{
+		this.table.classList.remove("present");
+		this.table.classList.remove("too-many")
+
+		this.isPresentOnce = false;
+		
+		let count = this.delegate.squareSubwordCount(this)
+		if (count == 1)
+		{
+			this.table.classList.add("present");
+			this.isPresentOnce = true;
+		}
+		else if (count > 1)
+		{
+			this.table.classList.add("too-many")
+			this.isPresentOnce = false;
+		}
+	}
+}
+
+class MatrixCycle {
+	constructor(parentElement, delegate, len)
+	{
+		this.parentElement = parentElement
+		this.delegate = delegate
+		
+		this.selectedColumn = 0
+		this.selectedRow = 0
+		
+		
+		this.length = len // just doing squares for now.
+				
+		this.values = Array.from({ length: this.length * this.length})
+		
+		this.rows = Array.from({length: this.length})
+		this.cells = Array.from({ length: this.length * this.length})
+		
+		const table = document.createElement("table");
+		
+		for (var row = 0; row < this.length; row++)
+		{
+			this.rows[row] = document.createElement("tr")
+			
+			for (var column = 0; column < this.length; column++)
+			{
+				this.setValueAt(row, column, "0")
+				this.cells[this.length * row + column] = document.createElement("td")
+				this.cells[this.length * row + column].innerHTML = this.valueAt(row, column)
+
+				this.rows[row].appendChild(this.cells[this.length * row + column])
+			}
+			table.appendChild(this.rows[row])		
+		}
+		
+		this.parentElement.appendChild(table)
+		
+		this.update()
+	}
+
+	setValueAt(row, column, value)
+	{
+		this.values[this.length * row + column] = value
+	}
+
+	valueAt(row, column)
+	{
+		if (row == this.length) row = 0
+		if (column == this.length) column = 0
+		return this.values[this.length * row + column]
+	}
+
+	squareSubwordCount(sqw)
+	{
+		var found = 0
+		// sqw is an object
+		for (var row = 0; row < this.length; row++)
+		{
+			for (var column = 0; column < this.length; column++)
+			{
+				if ((this.valueAt(row+0, column+0) == sqw.valueAt(0, 0)) &&
+					(this.valueAt(row+0, column+1) == sqw.valueAt(0, 1)) &&
+					(this.valueAt(row+1, column+0) == sqw.valueAt(1, 0)) &&
+					(this.valueAt(row+1, column+1) == sqw.valueAt(1, 1)))
+				{
+					found += 1
+				}
+			}
+		}
+		return found
+	}
+	
+	// User interface stuff
+	incrementSelectedColumn()
+	{
+		this.selectedColumn += 1
+		if (this.selectedColumn == this.length)
+		{
+			this.selectedColumn = 0
+		}
+		this.update()
+	}
+
+	decrementSelectedColumn()
+	{
+		this.selectedColumn -= 1
+		if (this.selectedColumn < 0)
+		{
+			this.selectedColumn = this.length - 1
+		}
+		this.update()
+	}
+	
+	incrementSelectedRow()
+	{
+		this.selectedRow += 1
+		if (this.selectedRow == this.length)
+		{
+			this.selectedRow = 0
+		}
+		this.update()
+	}
+	
+	decrementSelectedRow()
+	{
+		this.selectedRow -= 1
+		if (this.selectedRow < 0)
+		{
+			this.selectedRow = this.length-1
+		}
+		this.update()
+	}
+		
+	rotl()
+	{
+		var temp = this.valueAt(this.selectedRow, 0);
+		for (var n = 0; n < this.length-1; n++)
+		{
+			this.setValueAt(this.selectedRow, n, this.valueAt(this.selectedRow, n+1));
+		}
+		this.setValueAt(this.selectedRow, this.length-1, temp)
+		this.update()
+	}
+	
+	rotr()
+	{
+		var temp = this.valueAt(this.selectedRow, this.length-1);
+		for (var n = this.length-1; n > 0; n--)
+		{
+			this.setValueAt(this.selectedRow, n, this.valueAt(this.selectedRow, n-1));
+		}
+		this.setValueAt(this.selectedRow, 0, temp)
+		this.update()
+	}
+		
+	flipSelectedValue()
+	{
+		if (this.valueAt(this.selectedRow, this.selectedColumn) == "0")
+		{
+			this.setValueAt(this.selectedRow, this.selectedColumn, "1")
+		} else
+		{
+			this.setValueAt(this.selectedRow, this.selectedColumn, "0")
+		}
+		
+		this.update()
+		this.delegate.updateSubwordPresence()
+	}
+	
+	update()
+	{
+		for (var row = 0; row < this.length; row++)
+		{
+			for (var column = 0; column < this.length; column++)
+			{
+				this.cells[this.length * row + column].innerHTML = this.valueAt(row, column)
+				this.cells[this.length * row + column].className = "unselected"
+				
+				if (row == this.selectedRow && column == this.selectedColumn)
+					this.cells[this.length * row + column].className = "selected"
+			}
+	
+		}
+	}
+
+}
+
+class DelegationHandler
+{
+	constructor(cw, sws) {
+		this.cw = cw
+		this.sws = sws
+	}
+	
+	setSws(sws) {
+		this.sws = sws
+	}
+	
+	updateSubwordPresence()
+	{
+		document.getElementById("happy-cat").hidden=false
+		this.sws.forEach((element) => 
+		{
+			element.update()
+			if (!element.isPresentOnce)
+			{
+				document.getElementById("happy-cat").hidden=true;
+			}
+		});	
+	}
+}
+
+function initializeDeBruijn() {
+	
+	cw = document.getElementById('cyclicWord')
+	sws = document.getElementById('subwords')
+
+	dh = new DelegationHandler(null, null)
+
+	ms = new MatrixCycle(cw, dh, 4)
+	
+	swobjs = [];
+	subwords.forEach((element) =>
+	{
+		sw = new SquareSubword(sws, ms, element)
+		swobjs.push(sw)
+	}
+	);
+	
+	dh.cw = ms
+	dh.setSws(swobjs)
+	dh.updateSubwordPresence()
+	
+	document.onkeydown = function(event) {
+	    var x = window.event ? window.event : e;
+		console.log(x.keyCode)
+		if (x.keyCode === 40)
+		{
+			ms.incrementSelectedRow();
+		} 
+		if (x.keyCode === 38) {
+			ms.decrementSelectedRow();
+		}
+		if (x.keyCode === 37)
+		{
+			ms.decrementSelectedColumn();
+		}
+		if (x.keyCode === 39)
+		{
+			ms.incrementSelectedColumn();
+		}
+		if (x.keyCode === 32)
+		{
+			ms.flipSelectedValue()
+		}
+		if (x.keyCode === 65)
+		{
+			ms.rotl()
+		}
+		if (x.keyCode === 68)
+		{
+			ms.rotr()
+		}
+	}
+}
+</script>
+
+</head>
+	
+<body onload="initializeDeBruijn();">
+	<p>This is a playground to explore the cycle shifting method of generating a debruijn torus. The left and right arrows change which column of the candidate cyclic word is selected and the up and down arrows change the row. The spacebar flips the bit. The "d" key rotates right and the "a" key rotates left. If the subword is present, it turns green. If all the subwords are present exactly once, a happy cat appears.</p>
+
+</body>
+
+<div id="cyclicWord"> </div>
+<br>
+<br>
+<div id="subwords"> </div>
+
+<br>
+<br>
+<br>
+<br>
+
+<img id="happy-cat" src="cat-in-repose.jpg">
+
+</html> 
