@@ -15,8 +15,12 @@
 		border: 1px black solid;
 	}
 	
-	tr.has-p {
+	tr.p-start {
 		background-color: #acacac;
+	}
+
+	tr.p-middle {
+		background-color: #cccccc;
 	}
 
 	td {
@@ -271,22 +275,46 @@ class CyclicTorusViewController
 		
 		var p = this.model.p
 		var u = this.model.u
+		var s = this.model.s
 		
 		// First row first.
-		var ps = p.rows[0].toString().split(',').join('')
 		var us = u.values.toString().split(',').join('')
 		us = us.replaceAll('w','0') + us.replaceAll('w','1')
 		us = us + us // lol
-		console.log(ps)
-		console.log(us)
-		console.log(us.indexOf(ps) % 8)
+
+		var a = ""
+
+		for (var r = 0; r < p.row_count; r++)
+		{
+			console.log(us.indexOf(p.rows[r].toString().split(',').join('')) % 8)
+			if (r > 0) a += Number(us.indexOf(p.rows[r].toString().split(',').join('')) % 8)
+		}
+		console.log(a)
+		var ss = s.values.toString().split(',').join('')
+		ss = ss + ss // lol
+		var s_row = ss.indexOf(a) % s.values.length - 1
+		console.log(ss.indexOf(a) % s.values.length)
 		
 		// Calculate p offsets
 		
 		this.rows.forEach((row, index)=>{
+			row.className = ""
+			if (index == s_row)
+			{
+				row.className = "p-start"
+			}
+			if (index > s_row && index < s_row + p.row_count)
+			{
+				row.className = "p-middle"
+			}
+			
+			
 			// first, append values of s
 			this.cells_for_row[index][0].innerHTML = this.model.s.valueAtIndex(index)
 			this.cells_for_row[index][0].className = "s-index"
+
+			// Figure out where first row of P is.
+			
 
 			// So, we need to compute the cyclic shift here.
 			//var total_shift = Number(this.model.s.valueAtIndex(0))
@@ -298,6 +326,8 @@ class CyclicTorusViewController
 
 			// mod in js returns negative values, sigh
 			total_shift = (total_shift + this.model.u.length) % this.model.u.length
+			
+			
 			
 			this.cells_for_row[index][1].innerHTML = total_shift
 			this.cells_for_row[index][1].className = "st-index"
@@ -460,7 +490,7 @@ function initializeDeBruijn() {
 </head>
 	
 <body onload="initializeDeBruijn();">
-	<p>This is a playground to explore the cycle shifting method of generating a debruijn torus. Also a cute cat.</p>
+	<p>This is a playground to explore the cycle shifting method of generating a universal partial torus. Also a cute cat.</p>
 
 </body>
 
