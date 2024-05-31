@@ -1,0 +1,487 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+	body {
+		margin: 20px;
+		padding: 0px;
+	}
+	
+	canvas {
+		border: 1px black solid;
+	}
+	
+	table {
+		border: 1px black solid;
+	}
+	
+	tr.has-p {
+		background-color: #acacac;
+	}
+
+	td {
+		border: 1px gray solid;
+	}
+	
+	td.selected {
+		background-color: #f0f000;
+	}
+	
+	td.s-index {
+		background-color: #fcfccc;
+	}
+	
+	td.st-index {
+		background-color: #ccfcfc;
+		padding-right: 20px;
+	}
+	table.subword {
+		float: left;
+		margin-left: 20px;
+	}
+	
+	table.present {
+		background-color: #ccfccc;
+	}
+	
+	table.too-many {
+		background-color: #fccccc;
+	}
+	</style>
+		
+	<script type="text/javascript">
+
+class SubMatrixModel
+{
+	constructor(r, c, u)
+	{
+		
+		this.delegates = new Array()
+	
+		this.row_count = r
+		this.column_count = c // must be word size of u
+	
+		this.a = new Array(this.row_count)
+		this.b = new Array(this.row_count - 1)
+	
+		this.rows = new Array(this.row_count)
+
+		for (var r = 0; r < this.row_count; r++)
+		{
+			this.rows[r] = new Array(this.column_count)
+			for (var c = 0; c < this.column_count; c++)
+			{
+				this.rows[r][c] = "0"
+			}
+		}
+	}
+	
+	addDelegate(delegate)
+	{
+		this.delegates.push(delegate)
+	}
+	valueAt(r,c)
+	{
+		return this.rows[r][c]
+	}
+	
+	setValueAt(r,c,value)
+	{
+		this.rows[r][c] = value
+	}
+}
+
+class CyclicTorusModel {
+	constructor(u, s, p)
+	{
+		this.delegates = new Array()
+		
+		// These both have to be cyclic string models
+		this.u = u
+		this.s = s
+		this.p = p
+	}
+	
+	addDelegate(delegate)
+	{
+		this.delegates.push(delegate)
+	}
+}
+
+class CyclicWordModel {
+	constructor(len, alphabet)
+	{
+		this.delegates = new Array()
+		
+		this.alphabet = alphabet
+		this.length = len
+				
+		this.values = Array.from({ length: this.length}, (v, i) => 0)
+	}
+
+	addDelegate(delegate)
+	{
+		this.delegates.push(delegate)
+	}
+
+	valueAtIndex(index)
+	{
+		return this.values[index]
+	}
+
+	setValueAtIndex(index, value)
+	{
+		this.values[index] = value
+		
+		this.delegates.forEach((d) => {
+			d.valueDidChange(this, index)
+		});
+	}
+	
+	incrementValueAtIndex(index)
+	{
+		this.delegates.forEach((d) => {
+			d.valueDidChange(this, index)
+		});
+	}
+	
+	
+	indexForSubword(subword)
+	{
+		return 0
+	}
+	
+	rotateLeft(shiftSize)
+	{
+		console.log("rotl");
+		
+		var temp = this.values[0]
+		for (var x = 0; x < this.length-1; x++)
+		{
+			this.values[x] = this.values[x+1]
+		}		
+		this.values[this.length-1] = temp
+
+		this.delegates.forEach((d) => {
+			d.allValuesDidChange(this)
+		});
+	}
+	
+	rotateRight(shiftSize)
+	{
+		console.log("rotr")
+		
+		var temp = this.values[this.length-1]
+
+		for (var x = this.length-1; x > 0; x--)
+		{
+			this.values[x] = this.values[x-1]
+		}		
+		this.values[0] = temp
+		
+		this.delegates.forEach((d) => {
+			d.allValuesDidChange(this)
+		});
+	}
+}
+
+class SubMatrixViewController
+{
+	constructor(element)
+	{
+		this.element = element
+		console.log(this.element)
+		
+		this.cells = document.createElement("table")
+		this.element.appendChild(this.cells)
+	}
+	
+	setModel(model)
+	{
+		this.model = model
+		console.log("Setting matrix view controller model to:", this.model);
+	
+		this.rows = Array.from({ length: this.model.row_count}, (v, i) => document.createElement("tr"))
+		this.cells_for_row = Array.from({ length: this.model.column_count}, (v, i) => [])
+	
+		this.rows.forEach((row, index)=> {
+			this.cells_for_row[index] = Array.from({ length: this.model.column_count}, (v, i) => document.createElement("td"))
+			for(var c = 0; c < this.model.column_count; c++)
+			{
+				row.appendChild(this.cells_for_row[index][c])
+			}
+			this.cells.appendChild(row)
+		});
+	
+		this.updateValues(this.model)
+	}
+	
+	updateValues(model)
+	{
+		this.rows.forEach((row, index)=>{
+			for(var c = 0; c < this.model.column_count; c++)
+			{
+				this.cells_for_row[index][c].innerHTML = this.model.valueAt(index, c)
+			}
+		});
+		
+	}
+}
+
+class CyclicTorusViewController 
+{
+	constructor(element)
+	{
+		this.element = element
+		console.log(this.element)
+		
+		this.cells = document.createElement("table")
+		this.element.appendChild(this.cells)
+	}
+	
+	setModel(model)
+	{
+		this.model = model
+		console.log("Setting torus view controller model to:", this.model);
+		
+		this.cells_for_row = Array.from({ length: this.model.s.length}, (v, i) => [])
+		this.rows = Array.from({ length: this.model.s.length}, (v, i) => document.createElement("tr"))
+		
+		this.rows.forEach((row, index)=>{
+			this.cells_for_row[index] = Array.from({ length: this.model.u.length+2}, (v, i) => document.createElement("td"))
+			// first, append values of s
+			row.appendChild(this.cells_for_row[index][0]) // s
+			row.appendChild(this.cells_for_row[index][1]) // s_total
+			
+			for(var x = 0; x < this.model.u.length; x++)
+			{
+				row.appendChild(this.cells_for_row[index][x+2])
+			}
+			
+			this.cells.appendChild(row)
+		});
+		
+		this.updateValues(this.model)
+	}
+	
+	updateValues(model)
+	{
+		// Ok - got to figure out where p is.
+		console.log(this.model.p)
+		
+		var p = this.model.p
+		var u = this.model.u
+		
+		// First row first.
+		var ps = p.rows[0].toString().split(',').join('')
+		var us = u.values.toString().split(',').join('')
+		us = us.replaceAll('w','0') + us.replaceAll('w','1')
+		us = us + us // lol
+		console.log(ps)
+		console.log(us)
+		console.log(us.indexOf(ps) % 8)
+		
+		// Calculate p offsets
+		
+		this.rows.forEach((row, index)=>{
+			// first, append values of s
+			this.cells_for_row[index][0].innerHTML = this.model.s.valueAtIndex(index)
+			this.cells_for_row[index][0].className = "s-index"
+
+			// So, we need to compute the cyclic shift here.
+			//var total_shift = Number(this.model.s.valueAtIndex(0))
+			var total_shift = 0
+			for (var i = 0; i <= index; i++)
+			{
+				total_shift += Number(this.model.s.valueAtIndex(i))
+			}
+
+			// mod in js returns negative values, sigh
+			total_shift = (total_shift + this.model.u.length) % this.model.u.length
+			
+			this.cells_for_row[index][1].innerHTML = total_shift
+			this.cells_for_row[index][1].className = "st-index"
+			
+			for(var x = 0; x < this.model.u.length; x++)
+			{
+				let horizontal = (x + total_shift) % this.model.u.length
+				this.cells_for_row[index][x+2].innerHTML = this.model.u.valueAtIndex(horizontal)
+			}
+		});
+		
+	}
+	
+	allValuesDidChange(model)
+	{
+		this.updateValues(this.model)
+	}
+	
+	valueDidChange(model, index)
+	{
+		this.updateValues(this.model)
+	}
+}
+
+class CyclicWordViewController
+{
+	constructor(element)
+	{
+		this.element = element
+		console.log(this.element)
+		// This delegate will own a horizontal table that represents the cyclic word and has buttons to modify it.
+		
+		this.cells = []
+		
+		this.rotl_button = document.createElement("button");
+		this.rotl_button.innerText = "<--"
+		
+		this.element.appendChild(this.rotl_button)
+		
+		this.rotr_button = document.createElement("button");
+		this.rotr_button.innerText = "-->"
+
+		this.element.appendChild(this.rotr_button)		
+
+		this.values = document.createElement("table")
+
+		this.values_row = document.createElement("tr")
+		this.values.appendChild(this.values_row)
+		
+		this.element.appendChild(this.values)
+	}
+	
+	setModel(model)
+	{
+		this.model = model
+		console.log("Setting Model to:", this.model)
+
+		this.rotr_button.addEventListener("click", (e) => {
+			this.model.rotateRight(1)
+		});
+
+		this.rotl_button.addEventListener("click", (e) => {
+			this.model.rotateLeft(1)
+		});
+
+		this.cells = Array.from({ length: this.model.length}, (v, i) => document.createElement("td"))
+				
+		for(var x = 0; x < this.model.length; x++)
+		{
+			this.cells[x].innerHTML = this.model.valueAtIndex(x)
+			this.values_row.appendChild(this.cells[x])
+		}
+	}
+	
+	allValuesDidChange(model)
+	{
+		if (this.cells.length == 0) return;
+
+		for(var x = 0; x < this.model.length; x++)
+		{
+			this.cells[x].innerHTML = this.model.valueAtIndex(x)
+		}
+	}
+	
+	valueDidChange(model, index)
+	{
+		if (this.cells.length == 0) return;
+		this.cells[index].innerHTML = this.model.valueAtIndex(x)
+	}
+}
+
+function initializeDeBruijn() {
+
+	let u_chars = "001w110w"
+	let u = new CyclicWordModel(u_chars.length, ["0","1","w"])
+	for(var x = 0; x < u_chars.length; x++)
+	{
+		u.setValueAtIndex(x, u_chars[x])
+	}
+
+	let u_vc = new CyclicWordViewController(document.getElementById("u"))
+
+	u_vc.setModel(u)
+	u.addDelegate(u_vc)
+
+
+	let s_chars = "0170203040506071127223137334142474451525357556162636467766543210"
+	let s = new CyclicWordModel(s_chars.length, ["0","1","2","3","4","5","6","7"])
+	for(var x = 0; x < s_chars.length; x++)
+	{
+		s.setValueAtIndex(x, s_chars[x])
+	}
+
+	let s_vc = new CyclicWordViewController(document.getElementById("s"))
+	
+	s_vc.setModel(s)
+	s.addDelegate(s_vc)
+
+	let p_chars = "001001101100"
+	let p = new SubMatrixModel(3,4, u)
+	for (var r = 0; r < 3; r++)
+	{
+		for (var c = 0; c < 4; c++)
+		{
+			p.setValueAt(r, c, p_chars[r * 4 + c])
+		}
+	}
+	
+	let p_vc = new SubMatrixViewController(document.getElementById("p"))
+	p_vc.setModel(p)
+	p.addDelegate(p_vc)
+
+	let mus = new CyclicTorusModel(u, s, p)
+	let mus_vc = new CyclicTorusViewController(document.getElementById("mus"))
+	mus_vc.setModel(mus)
+	
+	u.addDelegate(mus_vc)
+	s.addDelegate(mus_vc)
+	p.addDelegate(mus_vc)
+	mus.addDelegate(mus_vc)
+
+	document.onkeydown = function(event) {
+	    var x = window.event ? window.event : e;
+		console.log(x.keyCode)
+		if (x.keyCode === 38 || x.keyCode === 40) {
+			
+		}
+		if (x.keyCode === 65)
+		{
+			
+		}
+		if (x.keyCode === 39)
+		{
+			
+		}
+	}
+}
+</script>
+
+</head>
+	
+<body onload="initializeDeBruijn();">
+	<p>This is a playground to explore the cycle shifting method of generating a debruijn torus. Also a cute cat.</p>
+
+</body>
+
+P<div id="p"></div>
+<br>
+<br>
+
+U<div id="u"></div>
+<br>
+<br>
+S<div id="s"></div>
+<br>
+<br>
+m(us)
+<div id="mus"></div>
+
+<br>
+<br>
+<br>
+<br>
+
+<img id="happy-cat" src="cat-in-repose.jpg">
+
+</html> 
