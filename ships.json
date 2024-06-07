@@ -1,6 +1,0 @@
-{
-	"ships": [
-		{ "name": "Washington", "x": 5, "y": 7 },
-		{ "name": "South Dakota", "x": 3, "y": 6 },
-	]
-}
