@@ -109,13 +109,17 @@ class SubMatrixViewController
 		
 		this.rows.forEach((row, index)=>{
 			this.cells_for_row[index][0].innerHTML = p.a[index]
+			this.cells_for_row[index][0].className = "p-a"
+			
 			if (index == 0)
 			{
 				this.cells_for_row[index][1].innerHTML = "x"
+				this.cells_for_row[index][1].className = "p-b"
 			}
 			else
 			{
 				this.cells_for_row[index][1].innerHTML = p.b[index-1]
+				this.cells_for_row[index][1].className = "p-b"
 			}
 			
 			for(var c = 0; c < this.model.column_count; c++)
